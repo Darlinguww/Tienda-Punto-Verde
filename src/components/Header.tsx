@@ -31,7 +31,6 @@ export default function Header({ onMenuToggle }: HeaderProps) {
           <a href="#" className="text-brand-dark border-b-2 border-brand-primary pb-1">Inicio</a>
           <a href="#" className="text-slate-500 hover:text-brand-primary transition-colors">Catálogo</a>
           <a href="#" className="text-slate-500 hover:text-brand-primary transition-colors">Garantía</a>
-          <a href="#" className="text-slate-500 hover:text-brand-primary transition-colors">Sostenibilidad</a>
         </nav>
 
         <div className="flex items-center gap-2">

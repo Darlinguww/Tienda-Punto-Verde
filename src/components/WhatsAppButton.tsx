@@ -18,7 +18,7 @@ export default function WhatsAppButton() {
       console.error('Analytics error:', e);
     }
     
-    window.open('https://wa.me/573000000000?text=Hola,%20me%20gustaría%20hacer%20un%20pedido%20en%20Punto%20Verde.', '_blank');
+    window.open('https://wa.me/573028308997?text=Hola,%20me%20gustaría%20hacer%20un%20pedido%20en%20Punto%20Verde.', '_blank');
   };
 
   return (
