@@ -1,0 +1,31 @@
+{
+  "changelists": [
+    {
+      "name": "Default",
+      "files": [
+        ".env.example",
+        ".gitignore",
+        "index.html",
+        "metadata.json",
+        "package-lock.json",
+        "package.json",
+        "server.ts",
+        "src/app.tsx",
+        "src/components/Benefits.tsx",
+        "src/components/Header.tsx",
+        "src/components/Hero.tsx",
+        "src/components/ProductCard.tsx",
+        "src/components/Sidebar.tsx",
+        "src/components/WhatsAppButton.tsx",
+        "src/constants.ts",
+        "src/index.css",
+        "src/main.tsx",
+        "src/types.tsx",
+        "tsconfig.json",
+        "vite.config.ts",
+        ".vscode/changelists.json"
+      ]
+    }
+  ],
+  "active": "Default"
+}
