@@ -5,6 +5,8 @@ import { PRODUCTS as INITIAL_PRODUCTS } from '../constants';
 interface ProductContextType {
   products: Product[];
   addProduct: (product: Omit<Product, 'id'>) => void;
+  updateProduct: (id: string, product: Omit<Product, 'id'>) => void;
+  removeProduct: (id: string) => void;
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
@@ -20,8 +22,16 @@ export function ProductProvider({ children }: { children: ReactNode }) {
     setProducts((prev) => [newProduct, ...prev]);
   };
 
+  const updateProduct = (id: string, updatedData: Omit<Product, 'id'>) => {
+    setProducts((prev) => prev.map(p => p.id === id ? { ...updatedData, id } : p));
+  };
+
+  const removeProduct = (id: string) => {
+    setProducts((prev) => prev.filter(p => p.id !== id));
+  };
+
   return (
-    <ProductContext.Provider value={{ products, addProduct }}>
+    <ProductContext.Provider value={{ products, addProduct, updateProduct, removeProduct }}>
       {children}
     </ProductContext.Provider>
   );
