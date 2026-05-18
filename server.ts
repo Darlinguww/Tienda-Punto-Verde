@@ -14,14 +14,9 @@ async function startServer() {
   // Middleware para JSON
   app.use(express.json());
 
-  // API: Registro de analíticas de WhatsApp (Ejemplo de backend)
-  app.post("/api/analytics/click", (req, res) => {
-    const { productId, timestamp } = req.body;
-    console.log(
-      `[Analytics] Click en WhatsApp para producto ${productId} a las ${timestamp}`,
-    );
-    res.json({ status: "success", message: "Click registrado" });
-  });
+  // Importar la API (Serverless en producción, middleware en local)
+  const { default: apiApp } = await import("./api/index.ts");
+  app.use(apiApp);
 
   // Integración con Vite (Frontend)
   if (process.env.NODE_ENV !== "production") {
