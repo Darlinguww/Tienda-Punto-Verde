@@ -1,14 +1,15 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ShoppingCart, Truck, Shield, Headphones } from "lucide-react";
-import { PRODUCTS } from "../constants";
 import { useCart } from "../context/CartContext";
+import { useProductsContext } from "../context/ProductContext";
 
 export default function ProductDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { addToCart, setIsCartOpen } = useCart();
+  const { products } = useProductsContext();
 
-  const product = PRODUCTS.find(
+  const product = products.find(
     (p) => p.name.toLowerCase().replace(/\s+/g, "-").replace(/"/g, "") === slug,
   );
 

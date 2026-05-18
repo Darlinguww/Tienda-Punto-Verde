@@ -4,6 +4,7 @@ export interface UserProfile {
   name: string;
   email: string;
   address: string;
+  isAdmin?: boolean;
 }
 
 interface AuthContextType {
@@ -22,12 +23,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const login = (email: string, password: string) => {
-    // Simulación de login (en el futuro se conectará a Supabase)
+    // Simulación de login de administrador
+    if (email === 'admin@puntoverde.com' && password === 'admin123') {
+      setUser({
+        name: 'Administrador',
+        email,
+        address: 'Punto Verde HQ',
+        isAdmin: true
+      });
+      setIsLoginModalOpen(false);
+      return;
+    }
+
+    // Simulación de login de cliente
     if (email && password) {
       setUser({
         name: email.split('@')[0], // Nombre temporal
         email,
-        address: "Por definir"
+        address: "Por definir",
+        isAdmin: false
       });
       setIsLoginModalOpen(false);
     }

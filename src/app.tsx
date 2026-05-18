@@ -1,18 +1,18 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import Hero from "./components/Hero";
 import ProductCard from "./components/ProductCard";
 import Benefits from "./components/Benefits";
-import WhatsAppButton from "./components/WhatsAppButton";
-import ProductDetail from "./components/ProductDetail";
-import { PRODUCTS } from "./constants";
 import { Category } from "./types";
 import { useState, useEffect } from "react";
 import CartDrawer from "./components/CartDrawer";
 import GuaranteePage from "./components/GuaranteePage";
 import LoginModal from "./components/LoginModal";
+import ProductDetail from "./components/ProductDetail";
 import { useAuth } from "./context/AuthContext";
+import { useProductsContext } from "./context/ProductContext";
+import AdminPanel from "./components/AdminPanel";
 
 function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Category }) {
   const [activeCategory, setActiveCategory] = useState<Category>(defaultCategory);
@@ -23,9 +23,12 @@ function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Categor
   
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const { isLoginModalOpen, setIsLoginModalOpen } = useAuth();
+  const { isLoginModalOpen, setIsLoginModalOpen, user } = useAuth();
+  const navigate = useNavigate();
 
-  const filteredProducts = PRODUCTS.filter((p) => {
+  const { products } = useProductsContext();
+
+  const filteredProducts = products.filter((p) => {
     // 1. Filtro por categoría
     const matchesCategory =
       activeCategory === "Dashboard" || activeCategory === "Catálogo" ||
@@ -56,7 +59,13 @@ function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Categor
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           onCartClick={() => {}}
-          onUserClick={() => setIsLoginModalOpen(true)}
+          onUserClick={() => {
+            if (user?.isAdmin) {
+              navigate("/admin");
+            } else {
+              setIsLoginModalOpen(true);
+            }
+          }}
         />
 
         <div className="p-4 md:p-8 lg:p-12 max-w-[1600px] mx-auto">
@@ -192,6 +201,7 @@ export default function App() {
         <Route path="/catalogo" element={<MainPage defaultCategory="Catálogo" />} />
         <Route path="/garantia" element={<GuaranteePage />} />
         <Route path="/producto/:slug" element={<ProductDetail />} />
+        <Route path="/admin" element={<AdminPanel />} />
       </Routes>
       <CartDrawer />
       <LoginModal />
