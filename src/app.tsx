@@ -20,11 +20,20 @@ function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Categor
   useEffect(() => {
     setActiveCategory(defaultCategory);
   }, [defaultCategory]);
-  
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { isLoginModalOpen, setIsLoginModalOpen, user } = useAuth();
   const navigate = useNavigate();
+
+  // Track search
+  useEffect(() => {
+    if (searchQuery.trim().length > 2) {
+      const timeout = setTimeout(() => {
+        import("./lib/analytics").then(({ trackEvent }) => trackEvent('search', searchQuery.trim().toLowerCase()));
+      }, 1000);
+      return () => clearTimeout(timeout);
+    }
+  }, [searchQuery]);
 
   const { products } = useProductsContext();
 
