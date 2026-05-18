@@ -159,17 +159,18 @@ function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Categor
 
               <div>
                 <h4 className="font-display font-bold text-slate-900 mb-8 uppercase tracking-widest text-xs">
-                  Compania
+                  Compañía
                 </h4>
-                <ul className="space-y-4">
-                  {["Sobre Nosotros", "Sostenibilidad", "Garantia", "Contacto"].map((item) => (
-                    <a
-                      key={item}
-                      href="#"
-                      className="text-sm font-medium text-slate-500 hover:text-brand-primary transition-colors"
-                    >
-                      {item}
-                    </a>
+                <ul className="space-y-4 flex flex-col">
+                  {["Sobre Nosotros", "Sostenibilidad", "Garantía", "Contacto"].map((item) => (
+                    <li key={item}>
+                      <a
+                        href={item === "Garantía" ? "/garantia" : "#"}
+                        className="text-sm font-medium text-slate-500 hover:text-brand-primary transition-colors"
+                      >
+                        {item}
+                      </a>
+                    </li>
                   ))}
                 </ul>
               </div>
