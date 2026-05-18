@@ -8,13 +8,18 @@ import WhatsAppButton from "./components/WhatsAppButton";
 import ProductDetail from "./components/ProductDetail";
 import { PRODUCTS } from "./constants";
 import { Category } from "./types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CartDrawer from "./components/CartDrawer";
 import GuaranteePage from "./components/GuaranteePage";
 import LoginModal from "./components/LoginModal";
 
 function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Category }) {
   const [activeCategory, setActiveCategory] = useState<Category>(defaultCategory);
+  
+  // Refrescar la categoría si el usuario cambia de ruta en el menú (ej. de Inicio a Catálogo)
+  useEffect(() => {
+    setActiveCategory(defaultCategory);
+  }, [defaultCategory]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
