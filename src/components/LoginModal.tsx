@@ -1,16 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Mail, Lock, User as UserIcon, MapPin } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginModal() {
-  const { isLoginModalOpen, setIsLoginModalOpen, login, register } = useAuth();
+  const { isLoginModalOpen, setIsLoginModalOpen, login, register, user } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
+  const navigate = useNavigate();
   
   // States para los formularios
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [address, setAddress] = useState('');
+
+  useEffect(() => {
+    if (user?.isAdmin) {
+      setIsLoginModalOpen(false);
+      navigate('/admin');
+    }
+  }, [user, navigate, setIsLoginModalOpen]);
 
   if (!isLoginModalOpen) return null;
 
