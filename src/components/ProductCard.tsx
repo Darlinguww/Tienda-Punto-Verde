@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Product } from '../types';
+import { useCart } from '../context/CartContext';
 
 interface ProductCardProps {
   product: Product;
@@ -10,6 +11,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, index }: ProductCardProps) {
+  const { addToCart } = useCart();
   const formattedPrice = new Intl.NumberFormat('es-CO', {
     style: 'currency',
     currency: 'COP',
@@ -44,7 +46,10 @@ export default function ProductCard({ product, index }: ProductCardProps) {
           
           <button 
             className="absolute bottom-6 right-6 w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-slate-900 shadow-xl shadow-slate-900/5 translate-y-24 group-hover:translate-y-0 transition-all duration-500 hover:bg-brand-primary hover:text-white z-20"
-            onClick={(e) => { e.preventDefault(); }}
+            onClick={(e) => { 
+              e.preventDefault(); 
+              addToCart(product);
+            }}
           >
             <ShoppingCart size={22} strokeWidth={2.5} />
           </button>

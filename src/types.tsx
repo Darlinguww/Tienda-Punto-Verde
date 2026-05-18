@@ -16,4 +16,9 @@ export interface Benefit {
   icon: string;
 }
 
-export type Category = 'Ventiladores' | 'TV' | 'Lavadoras' | 'Neveras' | 'Promociones' | 'Dashboard';
+export type Category = 'Ventiladores' | 'TV' | 'Lavadoras' | 'Neveras' | 'Promociones' | 'Dashboard' | 'Catálogo';
+
+export interface CartItem {
+  product: Product;
+  quantity: number;
+}

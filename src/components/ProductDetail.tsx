@@ -1,10 +1,12 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ShoppingCart, Truck, Shield, Headphones } from "lucide-react";
 import { PRODUCTS } from "../constants";
+import { useCart } from "../context/CartContext";
 
 export default function ProductDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { addToCart, setIsCartOpen } = useCart();
 
   const product = PRODUCTS.find(
     (p) => p.name.toLowerCase().replace(/\s+/g, "-").replace(/"/g, "") === slug,
@@ -95,11 +97,21 @@ export default function ProductDetail() {
             </div>
 
             <div className="flex gap-4 mb-10">
-              <button className="flex-1 bg-brand-primary text-white py-4 px-8 rounded-2xl font-bold text-sm uppercase tracking-widest hover:bg-brand-dark transition-colors flex items-center justify-center gap-3 shadow-lg shadow-brand-primary/20">
+              <button 
+                onClick={() => {
+                  addToCart(product);
+                  navigate("/");
+                  setTimeout(() => setIsCartOpen(true), 100);
+                }}
+                className="flex-1 bg-brand-primary text-white py-4 px-8 rounded-2xl font-bold text-sm uppercase tracking-widest hover:bg-brand-dark transition-colors flex items-center justify-center gap-3 shadow-lg shadow-brand-primary/20"
+              >
                 <ShoppingCart size={20} />
                 Comprar Ahora
               </button>
-              <button className="w-16 h-16 bg-white border border-slate-100 rounded-2xl flex items-center justify-center text-slate-900 hover:border-brand-primary/30 hover:text-brand-primary transition-all">
+              <button 
+                onClick={() => addToCart(product)}
+                className="w-16 h-16 bg-white border border-slate-100 rounded-2xl flex items-center justify-center text-slate-900 hover:border-brand-primary/30 hover:text-brand-primary transition-all"
+              >
                 <ShoppingCart size={24} />
               </button>
             </div>

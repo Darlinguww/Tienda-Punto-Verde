@@ -9,19 +9,31 @@ import ProductDetail from "./components/ProductDetail";
 import { PRODUCTS } from "./constants";
 import { Category } from "./types";
 import { useState } from "react";
+import CartDrawer from "./components/CartDrawer";
+import GuaranteePage from "./components/GuaranteePage";
+import LoginModal from "./components/LoginModal";
 
-function MainPage() {
-  const [activeCategory, setActiveCategory] = useState<Category>("Dashboard");
+function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Category }) {
+  const [activeCategory, setActiveCategory] = useState<Category>(defaultCategory);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredProducts =
-    activeCategory === "Dashboard"
-      ? PRODUCTS
-      : PRODUCTS.filter(
-          (p) =>
-            p.category === activeCategory ||
-            (activeCategory === "Promociones" && p.promotion),
-        );
+  const filteredProducts = PRODUCTS.filter((p) => {
+    // 1. Filtro por categoría
+    const matchesCategory =
+      activeCategory === "Dashboard" || activeCategory === "Catálogo" ||
+      p.category === activeCategory ||
+      (activeCategory === "Promociones" && p.promotion);
+
+    // 2. Filtro por búsqueda de texto
+    const searchLower = searchQuery.toLowerCase();
+    const matchesSearch =
+      p.name.toLowerCase().includes(searchLower) ||
+      p.description.toLowerCase().includes(searchLower);
+
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -33,18 +45,23 @@ function MainPage() {
       />
 
       <main className="flex-1 lg:ml-64 transition-all">
-        <Header onMenuToggle={() => setIsSidebarOpen(true)} />
+        <Header 
+          onMenuToggle={() => setIsSidebarOpen(true)}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onCartClick={() => {}} // Ya lo maneja el contexto interno de Header
+          onUserClick={() => setIsLoginOpen(true)}
+        />
 
         <div className="p-4 md:p-8 lg:p-12 max-w-[1600px] mx-auto">
           {activeCategory === "Dashboard" && <Hero />}
 
-          <section className="mb-16">
+          <section className="mb-16 mt-8">
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-3xl font-display text-brand-dark mb-2">
-                  {activeCategory === "Dashboard"
-                    ? "Novedades de Temporada"
-                    : activeCategory}
+                  {activeCategory === "Dashboard" ? "Novedades de Temporada" : 
+                   activeCategory === "Catálogo" ? "Catálogo de Productos" : activeCategory}
                 </h2>
                 <p className="text-gray-500 text-sm">
                   Explora nuestra coleccion curada de productos eco-eficientes.
@@ -158,6 +175,8 @@ function MainPage() {
       </main>
 
       <WhatsAppButton />
+      <CartDrawer />
+      <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
     </div>
   );
 }
@@ -166,6 +185,8 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<MainPage />} />
+      <Route path="/catalogo" element={<MainPage defaultCategory="Catálogo" />} />
+      <Route path="/garantia" element={<GuaranteePage />} />
       <Route path="/producto/:slug" element={<ProductDetail />} />
     </Routes>
   );
