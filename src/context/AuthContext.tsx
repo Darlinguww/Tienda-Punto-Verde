@@ -1,0 +1,61 @@
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+
+export interface UserProfile {
+  name: string;
+  email: string;
+  address: string;
+}
+
+interface AuthContextType {
+  user: UserProfile | null;
+  login: (email: string, password: string) => void;
+  register: (name: string, email: string, password: string, address: string) => void;
+  logout: () => void;
+  isLoginModalOpen: boolean;
+  setIsLoginModalOpen: (isOpen: boolean) => void;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  const login = (email: string, password: string) => {
+    // Simulación de login (en el futuro se conectará a Supabase)
+    if (email && password) {
+      setUser({
+        name: email.split('@')[0], // Nombre temporal
+        email,
+        address: "Por definir"
+      });
+      setIsLoginModalOpen(false);
+    }
+  };
+
+  const register = (name: string, email: string, password: string, address: string) => {
+    // Simulación de registro
+    if (name && email && password && address) {
+      setUser({ name, email, address });
+      setIsLoginModalOpen(false);
+    }
+  };
+
+  const logout = () => {
+    setUser(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, login, register, logout, isLoginModalOpen, setIsLoginModalOpen }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth debe ser usado dentro de un AuthProvider');
+  }
+  return context;
+}

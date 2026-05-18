@@ -1,6 +1,7 @@
 import React from 'react';
 import { Search, ShoppingCart, User, Menu } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { Link, useLocation } from 'react-router-dom';
 
 interface HeaderProps {
@@ -13,6 +14,7 @@ interface HeaderProps {
 
 export default function Header({ onMenuToggle, searchQuery, onSearchChange, onCartClick, onUserClick }: HeaderProps) {
   const { cartCount, setIsCartOpen } = useCart();
+  const { user } = useAuth();
   const location = useLocation();
 
   return (
@@ -68,8 +70,9 @@ export default function Header({ onMenuToggle, searchQuery, onSearchChange, onCa
               </span>
             )}
           </button>
-          <button onClick={onUserClick} className="p-3 hover:bg-slate-50 rounded-2xl transition-all group">
-            <User size={20} className="text-slate-600 group-hover:text-brand-primary" />
+          <button onClick={onUserClick} className="p-3 hover:bg-slate-50 rounded-2xl transition-all group flex items-center gap-2">
+            <User size={20} className={`group-hover:text-brand-primary ${user ? 'text-brand-primary' : 'text-slate-600'}`} />
+            {user && <span className="text-xs font-bold text-brand-dark hidden md:block">{user.name}</span>}
           </button>
         </div>
       </div>

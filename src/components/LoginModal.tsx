@@ -1,25 +1,37 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock, User as UserIcon } from 'lucide-react';
+import { X, Mail, Lock, User as UserIcon, MapPin } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
-interface LoginModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
+export default function LoginModal() {
+  const { isLoginModalOpen, setIsLoginModalOpen, login, register } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
+  
+  // States para los formularios
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [address, setAddress] = useState('');
 
-  if (!isOpen) return null;
+  if (!isLoginModalOpen) return null;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isLogin) {
+      login(email, password);
+    } else {
+      register(name, email, password, address);
+    }
+  };
 
   return (
     <>
       <div 
         className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 transition-opacity"
-        onClick={onClose}
+        onClick={() => setIsLoginModalOpen(false)}
       />
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-[32px] shadow-2xl z-50 p-8">
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-[32px] shadow-2xl z-50 p-8 max-h-[90vh] overflow-y-auto">
         <button 
-          onClick={onClose}
+          onClick={() => setIsLoginModalOpen(false)}
           className="absolute top-6 right-6 p-2 hover:bg-slate-100 rounded-xl transition-colors"
         >
           <X size={20} className="text-slate-500" />
@@ -32,25 +44,44 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           <h2 className="text-2xl font-bold text-slate-900 font-display">
             {isLogin ? 'Bienvenido de nuevo' : 'Crear cuenta'}
           </h2>
-          <p className="text-slate-500 mt-2">
-            {isLogin ? 'Ingresa tus datos para continuar' : 'Únete a la revolución eco-eficiente'}
+          <p className="text-slate-500 mt-2 text-sm">
+            {isLogin ? 'Ingresa tus datos para continuar con tu compra' : 'Regístrate para poder enviar tu pedido'}
           </p>
         </div>
 
-        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); alert("Funcionalidad de Supabase en construcción"); }}>
+        <form className="space-y-4" onSubmit={handleSubmit}>
           {!isLogin && (
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nombre completo</label>
-              <div className="relative">
-                <UserIcon size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input 
-                  type="text" 
-                  placeholder="Juan Pérez"
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-brand-primary/30 focus:ring-4 focus:ring-brand-primary/10 transition-all outline-none"
-                  required
-                />
+            <>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nombre completo</label>
+                <div className="relative">
+                  <UserIcon size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input 
+                    type="text" 
+                    placeholder="Juan Pérez"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-brand-primary/30 focus:ring-4 focus:ring-brand-primary/10 transition-all outline-none"
+                    required
+                  />
+                </div>
               </div>
-            </div>
+              
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Dirección de envío</label>
+                <div className="relative">
+                  <MapPin size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input 
+                    type="text" 
+                    placeholder="Calle 123 # 45 - 67, Ciudad"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-brand-primary/30 focus:ring-4 focus:ring-brand-primary/10 transition-all outline-none"
+                    required
+                  />
+                </div>
+              </div>
+            </>
           )}
           
           <div>
@@ -60,6 +91,8 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               <input 
                 type="email" 
                 placeholder="juan@ejemplo.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-brand-primary/30 focus:ring-4 focus:ring-brand-primary/10 transition-all outline-none"
                 required
               />
@@ -73,6 +106,8 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               <input 
                 type="password" 
                 placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-brand-primary/30 focus:ring-4 focus:ring-brand-primary/10 transition-all outline-none"
                 required
               />

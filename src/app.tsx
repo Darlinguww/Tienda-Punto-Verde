@@ -12,17 +12,18 @@ import { useState, useEffect } from "react";
 import CartDrawer from "./components/CartDrawer";
 import GuaranteePage from "./components/GuaranteePage";
 import LoginModal from "./components/LoginModal";
+import { useAuth } from "./context/AuthContext";
 
 function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Category }) {
   const [activeCategory, setActiveCategory] = useState<Category>(defaultCategory);
   
-  // Refrescar la categoría si el usuario cambia de ruta en el menú (ej. de Inicio a Catálogo)
   useEffect(() => {
     setActiveCategory(defaultCategory);
   }, [defaultCategory]);
+  
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const { isLoginModalOpen, setIsLoginModalOpen } = useAuth();
 
   const filteredProducts = PRODUCTS.filter((p) => {
     // 1. Filtro por categoría
@@ -54,8 +55,8 @@ function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Categor
           onMenuToggle={() => setIsSidebarOpen(true)}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          onCartClick={() => {}} // Ya lo maneja el contexto interno de Header
-          onUserClick={() => setIsLoginOpen(true)}
+          onCartClick={() => {}}
+          onUserClick={() => setIsLoginModalOpen(true)}
         />
 
         <div className="p-4 md:p-8 lg:p-12 max-w-[1600px] mx-auto">
@@ -179,20 +180,21 @@ function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Categor
         </div>
       </main>
 
-      <WhatsAppButton />
-      <CartDrawer />
-      <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
     </div>
   );
 }
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<MainPage />} />
-      <Route path="/catalogo" element={<MainPage defaultCategory="Catálogo" />} />
-      <Route path="/garantia" element={<GuaranteePage />} />
-      <Route path="/producto/:slug" element={<ProductDetail />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<MainPage />} />
+        <Route path="/catalogo" element={<MainPage defaultCategory="Catálogo" />} />
+        <Route path="/garantia" element={<GuaranteePage />} />
+        <Route path="/producto/:slug" element={<ProductDetail />} />
+      </Routes>
+      <CartDrawer />
+      <LoginModal />
+    </>
   );
 }
