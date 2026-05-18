@@ -20,11 +20,20 @@ function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Categor
   useEffect(() => {
     setActiveCategory(defaultCategory);
   }, [defaultCategory]);
-  
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { isLoginModalOpen, setIsLoginModalOpen, user } = useAuth();
   const navigate = useNavigate();
+
+  // Track search
+  useEffect(() => {
+    if (searchQuery.trim().length > 2) {
+      const timeout = setTimeout(() => {
+        import("./lib/analytics").then(({ trackEvent }) => trackEvent('search', searchQuery.trim().toLowerCase()));
+      }, 1000);
+      return () => clearTimeout(timeout);
+    }
+  }, [searchQuery]);
 
   const { products } = useProductsContext();
 
@@ -150,17 +159,18 @@ function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Categor
 
               <div>
                 <h4 className="font-display font-bold text-slate-900 mb-8 uppercase tracking-widest text-xs">
-                  Compania
+                  Compañía
                 </h4>
-                <ul className="space-y-4">
-                  {["Sobre Nosotros", "Sostenibilidad", "Garantia", "Contacto"].map((item) => (
-                    <a
-                      key={item}
-                      href="#"
-                      className="text-sm font-medium text-slate-500 hover:text-brand-primary transition-colors"
-                    >
-                      {item}
-                    </a>
+                <ul className="space-y-4 flex flex-col">
+                  {["Sobre Nosotros", "Sostenibilidad", "Garantía", "Contacto"].map((item) => (
+                    <li key={item}>
+                      <a
+                        href={item === "Garantía" ? "/garantia" : "#"}
+                        className="text-sm font-medium text-slate-500 hover:text-brand-primary transition-colors"
+                      >
+                        {item}
+                      </a>
+                    </li>
                   ))}
                 </ul>
               </div>

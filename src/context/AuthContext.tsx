@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { trackEvent } from '../lib/analytics';
 
 export interface UserProfile {
   name: string;
@@ -50,7 +51,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = (name: string, email: string, password: string, address: string) => {
     // Simulación de registro
     if (name && email && password && address) {
-      setUser({ name, email, address });
+      setUser({
+        name,
+        email,
+        address,
+        isAdmin: false
+      });
+      trackEvent('registration');
       setIsLoginModalOpen(false);
     }
   };

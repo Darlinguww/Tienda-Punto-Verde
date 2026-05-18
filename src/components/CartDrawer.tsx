@@ -2,6 +2,7 @@ import React from 'react';
 import { X, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { trackEvent } from '../lib/analytics';
 
 // Simple WhatsApp icon SVG
 const WhatsAppIcon = ({ size = 24, className = "" }) => (
@@ -29,6 +30,9 @@ export default function CartDrawer() {
       setIsLoginModalOpen(true);
       return;
     }
+
+    // Rastrear métrica de click de WhatsApp
+    trackEvent('whatsapp_click');
 
     const phoneNumber = "573000000000"; // Número de la tienda
     let message = `*Nuevo Pedido - Punto Verde* 🌿\n\n`;

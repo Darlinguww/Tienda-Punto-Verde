@@ -1,13 +1,21 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import { ArrowLeft, ShoppingCart, Truck, Shield, Headphones } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useProductsContext } from "../context/ProductContext";
+import { trackEvent } from "../lib/analytics";
 
 export default function ProductDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { addToCart, setIsCartOpen } = useCart();
   const { products } = useProductsContext();
+
+  useEffect(() => {
+    if (slug) {
+      trackEvent('product_view', slug);
+    }
+  }, [slug]);
 
   const product = products.find(
     (p) => p.name.toLowerCase().replace(/\s+/g, "-").replace(/"/g, "") === slug,
