@@ -55,8 +55,8 @@ export const BENEFITS: Benefit[] = [
   },
   {
     id: "b2",
-    title: "Venta al Menudeo",
-    description: "Precios competitivos desde una sola unidad para tu hogar.",
+    title: "Venta competitiva",
+    description: "Buenos precios desde una sola unidad para tu hogar.",
     icon: "ShoppingBag",
   },
   {

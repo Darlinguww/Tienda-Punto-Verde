@@ -8,6 +8,9 @@ import { Category } from "./types";
 import { useState, useEffect } from "react";
 import CartDrawer from "./components/CartDrawer";
 import GuaranteePage from "./components/GuaranteePage";
+import AboutPage from "./components/AboutPage";
+import SustainabilityPage from "./components/SustainabilityPage";
+import ContactPage from "./components/ContactPage";
 import LoginModal from "./components/LoginModal";
 import ProductDetail from "./components/ProductDetail";
 import { useAuth } from "./context/AuthContext";
@@ -17,7 +20,7 @@ import WhatsAppFAB from "./components/WhatsAppFAB";
 
 function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Category }) {
   const [activeCategory, setActiveCategory] = useState<Category>(defaultCategory);
-  
+
   useEffect(() => {
     setActiveCategory(defaultCategory);
   }, [defaultCategory]);
@@ -26,28 +29,28 @@ function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Categor
   const { isLoginModalOpen, setIsLoginModalOpen, user } = useAuth();
   const navigate = useNavigate();
 
-  // Track search
+  const isCatalogo = activeCategory === "Catálogo";
+
   useEffect(() => {
-    if (searchQuery.trim().length > 2) {
+    if (isCatalogo && searchQuery.trim().length > 2) {
       const timeout = setTimeout(() => {
         import("./lib/analytics").then(({ trackEvent }) => trackEvent('search', searchQuery.trim().toLowerCase()));
       }, 1000);
       return () => clearTimeout(timeout);
     }
-  }, [searchQuery]);
+  }, [searchQuery, isCatalogo]);
 
   const { products, categories, loading } = useProductsContext();
 
   const filteredProducts = products.filter((p) => {
     const matchesCategory =
-      activeCategory === "Dashboard" || activeCategory === "Catálogo" ||
+      activeCategory === "Dashboard" ||
+      activeCategory === "Catálogo" ||
       p.category_slug === activeCategory ||
       (activeCategory === "promociones" && !!p.promotion);
 
-    const searchLower = searchQuery.toLowerCase();
-    const matchesSearch =
-      p.name.toLowerCase().includes(searchLower) ||
-      p.description.toLowerCase().includes(searchLower);
+    const matchesSearch = !isCatalogo || !searchQuery.trim() ||
+      p.name.toLowerCase().includes(searchQuery.toLowerCase());
 
     return matchesCategory && matchesSearch;
   });
@@ -76,9 +79,9 @@ function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Categor
       <main className="flex-1 lg:ml-64 transition-all flex flex-col">
         <Header
           onMenuToggle={() => setIsSidebarOpen(true)}
+          showSearch={isCatalogo}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          onCartClick={() => {}}
           onUserClick={() => {
             if (user?.isAdmin) {
               navigate("/admin");
@@ -101,7 +104,9 @@ function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Categor
                     : activeCategoryName}
                 </h2>
                 <p className="text-gray-500 text-sm">
-                  Explora nuestra coleccion curada de productos eco-eficientes.
+                  {activeCategory === "Catálogo" && searchQuery
+                    ? `Resultados para "${searchQuery}"`
+                    : "Explora nuestra coleccion curada de productos eco-eficientes."}
                 </p>
               </div>
 
@@ -154,7 +159,7 @@ function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Categor
                   soluciones sostenibles con garantia certificada.
                 </p>
                 <div className="flex gap-4">
-                  {["FB", "IG", "TW", "LI"].map((social) => (
+                  {["FB"].map((social) => (
                     <a
                       key={social}
                       href="#"
@@ -166,36 +171,24 @@ function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Categor
                 </div>
               </div>
 
-              <div>
-                <h4 className="font-display font-bold text-slate-900 mb-8 uppercase tracking-widest text-xs">
-                  Productos
-                </h4>
-                <ul className="space-y-4">
-                  {["Ventiladores", "TV & Audio", "Lavado Eco", "Refrigeracion"].map((item) => (
-                    <li key={item}>
-                      <a
-                        href="#"
-                        className="text-sm font-medium text-slate-500 hover:text-brand-primary transition-colors"
-                      >
-                        {item}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
 
               <div>
                 <h4 className="font-display font-bold text-slate-900 mb-8 uppercase tracking-widest text-xs">
                   Compañía
                 </h4>
                 <ul className="space-y-4 flex flex-col">
-                  {["Sobre Nosotros", "Sostenibilidad", "Garantía", "Contacto"].map((item) => (
-                    <li key={item}>
+                  {[
+                    { label: "Sobre Nosotros", path: "/sobre-nosotros" },
+                    { label: "Sostenibilidad", path: "/sostenibilidad" },
+                    { label: "Garantía", path: "/garantia" },
+                    { label: "Contacto", path: "/contacto" },
+                  ].map((item) => (
+                    <li key={item.label}>
                       <a
-                        href={item === "Garantía" ? "/garantia" : "#"}
+                        href={item.path}
                         className="text-sm font-medium text-slate-500 hover:text-brand-primary transition-colors"
                       >
-                        {item}
+                        {item.label}
                       </a>
                     </li>
                   ))}
@@ -207,19 +200,7 @@ function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Categor
               <div className="flex flex-col md:flex-row items-center gap-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                 <span>© 2026 PUNTO VERDE S.A.S.</span>
                 <span className="hidden md:block w-1.5 h-1.5 bg-brand-primary rounded-full" />
-                <span>NIT: 901.455.122-1</span>
-              </div>
-              <div className="flex items-center gap-8 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-brand-primary rounded-full animate-pulse" />
-                  Chat disponible hasta 6:00 PM
-                </div>
-                <a href="#" className="hover:text-white transition-colors">
-                  Terminos
-                </a>
-                <a href="#" className="hover:text-white transition-colors">
-                  Privacidad
-                </a>
+                <span>NIT: 901.xxx.xxx-1</span>
               </div>
             </div>
           </footer>
@@ -236,6 +217,9 @@ export default function App() {
         <Route path="/" element={<MainPage />} />
         <Route path="/catalogo" element={<MainPage defaultCategory="Catálogo" />} />
         <Route path="/garantia" element={<GuaranteePage />} />
+        <Route path="/sobre-nosotros" element={<AboutPage />} />
+        <Route path="/sostenibilidad" element={<SustainabilityPage />} />
+        <Route path="/contacto" element={<ContactPage />} />
         <Route path="/producto/:slug" element={<ProductDetail />} />
         <Route path="/admin" element={<AdminPanel />} />
       </Routes>

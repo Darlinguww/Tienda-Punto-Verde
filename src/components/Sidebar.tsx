@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Fan, Tv, WashingMachine, Refrigerator, Tag, type LucideIcon } from 'lucide-react';
+import { LayoutDashboard, Fan, Tv, WashingMachine, Refrigerator, Tag, Grid3X3, type LucideIcon } from 'lucide-react';
 import { useProductsContext } from '../context/ProductContext';
 
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -8,6 +8,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   WashingMachine,
   Refrigerator,
   Tag,
+  Grid3X3,
 };
 
 interface SidebarProps {
@@ -45,7 +46,6 @@ export default function Sidebar({ activeCategory, onCategoryChange, isOpen, onTo
             </div>
             <div>
               <h1 className="text-brand-dark font-display text-xl font-bold tracking-tight">Punto Verde</h1>
-              <p className="text-[9px] uppercase tracking-[0.2em] text-slate-400 font-bold">Premium</p>
             </div>
           </div>
 
@@ -61,6 +61,19 @@ export default function Sidebar({ activeCategory, onCategoryChange, isOpen, onTo
             >
               <LayoutDashboard size={18} strokeWidth={activeCategory === 'Dashboard' ? 2.5 : 2} />
               <span className="text-sm">Inicio</span>
+            </button>
+
+            <button
+              onClick={() => handleSelect('Catálogo')}
+              className={`
+                w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-200
+                ${activeCategory === 'Catálogo'
+                  ? 'bg-brand-light text-brand-primary font-bold shadow-sm shadow-brand-primary/5'
+                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}
+              `}
+            >
+              <Grid3X3 size={18} strokeWidth={activeCategory === 'Catálogo' ? 2.5 : 2} />
+              <span className="text-sm">Catálogo</span>
             </button>
 
             {categories.map((cat) => {

@@ -1,8 +1,8 @@
-import { ArrowLeft, ShieldCheck, Wrench, RefreshCw } from "lucide-react";
+import { ArrowLeft, Leaf, Heart, Users, Award } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 
-export default function GuaranteePage() {
+export default function AboutPage() {
   const navigate = useNavigate();
 
   return (
@@ -21,50 +21,49 @@ export default function GuaranteePage() {
 
           <div className="text-center mb-16">
             <div className="w-20 h-20 bg-brand-light rounded-full flex items-center justify-center mx-auto mb-6">
-              <ShieldCheck size={40} className="text-brand-primary" />
+              <Users size={40} className="text-brand-primary" />
             </div>
             <h1 className="text-4xl md:text-5xl font-display font-bold text-slate-900 mb-4">
-              Garantía Oficial Punto Verde
+              Sobre Nosotros
             </h1>
             <p className="text-slate-500 text-lg max-w-2xl mx-auto">
-              Todos nuestros productos cuentan con garantía oficial directa con el fabricante para tu total tranquilidad.
+              Conoce la historia y el propósito de Punto Verde, tu tienda de confianza para productos eco-eficientes.
             </p>
           </div>
 
           <div className="space-y-12">
             <section>
               <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-                <ShieldCheck className="text-brand-primary" />
-                Cobertura de 2 Años
+                <Heart className="text-brand-primary" />
+                Nuestra Historia
               </h2>
               <p className="text-slate-600 leading-relaxed">
-                Nuestros productos eco-eficientes están cubiertos por una garantía estándar de 2 años contra defectos de fabricación o fallas en el funcionamiento normal. Si tu equipo presenta algún inconveniente técnico, nuestro equipo de soporte se encargará de gestionarlo.
+                Punto Verde nació en Colombia con la visión de democratizar el acceso a tecnología eco-eficiente para el hogar. Somos distribuidores autorizados de las marcas más reconocidas del mercado, ofreciendo productos que combinan innovación, calidad y respeto por el medio ambiente.
               </p>
             </section>
 
             <section>
               <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-                <Wrench className="text-brand-primary" />
-                Soporte Técnico Especializado
+                <Award className="text-brand-primary" />
+                Nuestra Misión
               </h2>
               <p className="text-slate-600 leading-relaxed mb-4">
-                Contamos con técnicos certificados listos para ayudarte. Si requieres asistencia técnica, el proceso es:
+                Nuestra misión es proporcionar soluciones tecnológicas que reduzcan el consumo de energía y agua en los hogares colombianos, contribuye a un futuro más sostenible mientras economiza en las facturas de servicios públicos.
               </p>
-              <ul className="list-disc pl-6 space-y-2 text-slate-600">
-                <li>Contactar a nuestro equipo por WhatsApp con tu número de factura.</li>
-                <li>Describir el problema (puedes enviar fotos o videos).</li>
-                <li>Agendaremos una revisión remota o presencial según el caso.</li>
-              </ul>
             </section>
 
             <section>
               <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-                <RefreshCw className="text-brand-primary" />
-                Políticas de Devolución
+                <Leaf className="text-brand-primary" />
+                Valores
               </h2>
-              <p className="text-slate-600 leading-relaxed">
-                Tienes hasta 15 días hábiles después de la compra para solicitar un cambio o devolución si el producto no cumple con tus expectativas, siempre y cuando se encuentre en su empaque original, sin uso y con todas sus etiquetas y manuales.
-              </p>
+              <ul className="list-disc pl-6 space-y-2 text-slate-600">
+                <li>Compromiso con la sostenibilidad ambiental</li>
+                <li>Transparencia y honestidad en todas nuestras transacciones</li>
+                <li>Excelencia en el servicio al cliente</li>
+                <li>Productos de alta calidad con garantía oficial</li>
+                <li>Precios competitivos y accesibles</li>
+              </ul>
             </section>
           </div>
         </div>
