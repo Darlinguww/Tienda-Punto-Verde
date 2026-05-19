@@ -20,40 +20,33 @@ export function ProductProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let isMounted = true;
-    console.log('[ProductContext] Mounting, fetching data...');
+    const fetchStarted = { current: false };
 
     const fetchData = async () => {
-      console.log('[ProductContext] fetchData started');
+      if (fetchStarted.current) return;
+      fetchStarted.current = true;
+
       try {
-        const categoriesPromise = supabase
-          .from('categories')
-          .select('id, name, slug, icon, sort_order')
-          .eq('is_active', true)
-          .order('sort_order');
-
-        const productsPromise = supabase
-          .from('v_products_full')
-          .select('id, name, slug, description, description_short, price, images, featured, destacado, interes, promotion, category, category_slug')
-          .order('category_slug')
-          .order('featured', { ascending: false });
-
-        const [categoriesRes, productsRes] = await Promise.all([categoriesPromise, productsPromise]);
-
-        console.log('[ProductContext] Response received', { categoriesRes, productsRes });
+        const [categoriesRes, productsRes] = await Promise.all([
+          supabase
+            .from('categories')
+            .select('id, name, slug, icon, sort_order')
+            .eq('is_active', true)
+            .order('sort_order'),
+          supabase
+            .from('v_products_full')
+            .select('id, name, slug, description, description_short, price, images, featured, destacado, interes, promotion, category, category_slug')
+            .order('category_slug')
+            .order('featured', { ascending: false }),
+        ]);
 
         if (!isMounted) return;
 
-        if (categoriesRes.error) {
-          console.error('[ProductContext] Categories error:', categoriesRes.error);
-        } else if (categoriesRes.data) {
-          console.log('[ProductContext] Setting categories:', categoriesRes.data.length);
+        if (categoriesRes.data) {
           setCategories(categoriesRes.data as DbCategory[]);
         }
 
-        if (productsRes.error) {
-          console.error('[ProductContext] Products error:', productsRes.error);
-        } else if (productsRes.data) {
-          console.log('[ProductContext] Setting products:', productsRes.data.length);
+        if (productsRes.data) {
           setProducts(
             productsRes.data.map((p) => ({
               id: p.id as string,
@@ -71,20 +64,16 @@ export function ProductProvider({ children }: { children: ReactNode }) {
             }))
           );
         }
-      } catch (err) {
-        console.error('[ProductContext] Fetch error:', err);
+      } catch {
+        // ignore fetch errors
       } finally {
-        if (isMounted) {
-          console.log('[ProductContext] Done, setting loading false');
-          setLoading(false);
-        }
+        if (isMounted) setLoading(false);
       }
     };
 
     fetchData();
 
     return () => {
-      console.log('[ProductContext] Unmounting');
       isMounted = false;
     };
   }, []);

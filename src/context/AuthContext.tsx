@@ -75,64 +75,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let isMounted = true;
-    let profileFetched = false;
-    console.log('[AuthContext] Mounting, subscribing to auth state');
+    const profileFetchedRef = { current: false };
+
+    const fetchCustomerProfile = async (userId: string, basicProfile: UserProfile) => {
+      try {
+        const { data: profileData, error: profileError } = await supabase
+          .from('customers')
+          .select('id, name, email, whatsapp, country, department, city, address')
+          .eq('id', userId)
+          .single();
+
+        if (!isMounted) return;
+
+        if (profileData && !profileError) {
+          setUser({
+            id: profileData.id,
+            name: profileData.name ?? basicProfile.name,
+            email: profileData.email ?? basicProfile.email,
+            whatsapp: profileData.whatsapp ?? '',
+            country: (profileData as Record<string, unknown>).country as string ?? '',
+            department: (profileData as Record<string, unknown>).department as string ?? '',
+            city: (profileData as Record<string, unknown>).city as string ?? '',
+            address: profileData.address ?? '',
+            isAdmin: false,
+          });
+        }
+      } catch {
+        // ignore profile fetch errors
+      }
+    };
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('[AuthContext] onAuthStateChange', event, session?.user?.id);
       if (!isMounted) return;
 
-      try {
-        if (session?.user) {
-          const isAdmin = session.user.user_metadata?.is_admin === true;
-          const basicProfile: UserProfile = isAdmin
-            ? { id: session.user.id, name: 'Administrador', email: session.user.email ?? '', whatsapp: '', country: '', department: '', city: '', address: '', isAdmin: true as const }
-            : createFallbackProfile(session.user);
+      if (session?.user) {
+        const isAdmin = session.user.user_metadata?.is_admin === true;
+        const basicProfile: UserProfile = isAdmin
+          ? { id: session.user.id, name: 'Administrador', email: session.user.email ?? '', whatsapp: '', country: '', department: '', city: '', address: '', isAdmin: true as const }
+          : createFallbackProfile(session.user);
 
-          console.log('[AuthContext] Setting user (basic):', basicProfile.name);
-          setUser(basicProfile);
+        setUser(basicProfile);
 
-          if (!isAdmin && !profileFetched) {
-            profileFetched = true;
-            console.log('[AuthContext] Fetching customer profile from DB');
-
-            const { data: profileData, error: profileError } = await supabase
-              .from('customers')
-              .select('id, name, email, whatsapp, country, department, city, address')
-              .eq('id', session.user.id)
-              .single();
-
-            console.log('[AuthContext] Customer profile result:', { profileData, profileError });
-
-            if (!isMounted) return;
-
-            if (profileData && !profileError) {
-              console.log('[AuthContext] Updating user with profile data');
-              setUser({
-                id: profileData.id,
-                name: profileData.name ?? basicProfile.name,
-                email: profileData.email ?? basicProfile.email,
-                whatsapp: profileData.whatsapp ?? '',
-                country: (profileData as Record<string, unknown>).country as string ?? '',
-                department: (profileData as Record<string, unknown>).department as string ?? '',
-                city: (profileData as Record<string, unknown>).city as string ?? '',
-                address: profileData.address ?? '',
-                isAdmin: false,
-              });
-            }
-          }
-        } else {
-          profileFetched = false;
-          console.log('[AuthContext] No session, setting user null');
-          if (isMounted) setUser(null);
+        if (!isAdmin && !profileFetchedRef.current) {
+          profileFetchedRef.current = true;
+          fetchCustomerProfile(session.user.id, basicProfile);
         }
-      } catch (err) {
-        console.error('[AuthContext] Auth state change error:', err);
+      } else {
+        profileFetchedRef.current = false;
+        if (isMounted) setUser(null);
       }
     });
 
     return () => {
-      console.log('[AuthContext] Unmounting');
       isMounted = false;
       subscription.unsubscribe();
     };
