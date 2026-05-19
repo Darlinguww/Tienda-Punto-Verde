@@ -1,12 +1,14 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, ShoppingCart, Truck, Shield, Headphones } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useProductsContext } from "../context/ProductContext";
 import { trackEvent } from "../lib/analytics";
+import { cloudinaryWebP } from "../lib/cloudinary";
 
 export default function ProductDetail() {
   const { slug } = useParams();
+  const [imageLoaded, setImageLoaded] = useState(false);
   const navigate = useNavigate();
   const { addToCart, setIsCartOpen } = useCart();
   const { products } = useProductsContext();
@@ -18,7 +20,7 @@ export default function ProductDetail() {
   }, [slug]);
 
   const product = products.find(
-    (p) => p.name.toLowerCase().replace(/\s+/g, "-").replace(/"/g, "") === slug,
+    (p) => (p.slug ?? p.name.toLowerCase().replace(/\s+/g, "-").replace(/"/g, "")) === slug,
   );
 
   if (!product) {
@@ -76,10 +78,25 @@ export default function ProductDetail() {
                 </span>
               </div>
             )}
+
+            {!imageLoaded && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-slate-50">
+                <div className="relative">
+                  <div className="w-16 h-16 rounded-2xl bg-brand-primary/10 animate-pulse" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-brand-primary font-bold text-2xl font-display">P</span>
+                  </div>
+                  <div className="absolute -inset-1 rounded-[18px] border-2 border-brand-primary/20 animate-ping" />
+                </div>
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Cargando imagen...</span>
+              </div>
+            )}
+
             <img
-              src={product.image}
+              src={cloudinaryWebP(product.image, 1200)}
               alt={product.name}
-              className="w-full h-full object-cover"
+              onLoad={() => setImageLoaded(true)}
+              className={`w-full h-full object-cover transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
             />
           </div>
 

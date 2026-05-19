@@ -13,6 +13,7 @@ import ProductDetail from "./components/ProductDetail";
 import { useAuth } from "./context/AuthContext";
 import { useProductsContext } from "./context/ProductContext";
 import AdminPanel from "./components/AdminPanel";
+import WhatsAppFAB from "./components/WhatsAppFAB";
 
 function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Category }) {
   const [activeCategory, setActiveCategory] = useState<Category>(defaultCategory);
@@ -35,16 +36,14 @@ function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Categor
     }
   }, [searchQuery]);
 
-  const { products } = useProductsContext();
+  const { products, categories, loading } = useProductsContext();
 
   const filteredProducts = products.filter((p) => {
-    // 1. Filtro por categoría
     const matchesCategory =
       activeCategory === "Dashboard" || activeCategory === "Catálogo" ||
-      p.category === activeCategory ||
-      (activeCategory === "Promociones" && p.promotion);
+      p.category_slug === activeCategory ||
+      (activeCategory === "promociones" && !!p.promotion);
 
-    // 2. Filtro por búsqueda de texto
     const searchLower = searchQuery.toLowerCase();
     const matchesSearch =
       p.name.toLowerCase().includes(searchLower) ||
@@ -52,6 +51,18 @@ function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Categor
 
     return matchesCategory && matchesSearch;
   });
+
+  const activeCategoryName =
+    categories.find((c) => c.slug === activeCategory)?.name ?? activeCategory;
+
+  const popularProducts = [...products]
+    .filter(p => (p.interes ?? 0) > 0)
+    .sort((a, b) => (b.interes ?? 0) - (a.interes ?? 0));
+
+  const displayedProducts =
+    activeCategory === 'Dashboard' && popularProducts.length > 0
+      ? popularProducts
+      : filteredProducts;
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -62,8 +73,8 @@ function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Categor
         onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
       />
 
-      <main className="flex-1 lg:ml-64 transition-all">
-        <Header 
+      <main className="flex-1 lg:ml-64 transition-all flex flex-col">
+        <Header
           onMenuToggle={() => setIsSidebarOpen(true)}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -77,15 +88,17 @@ function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Categor
           }}
         />
 
-        <div className="p-4 md:p-8 lg:p-12 max-w-[1600px] mx-auto">
-          {activeCategory === "Dashboard" && <Hero />}
+        <div className="flex-1 p-4 md:p-8 lg:p-12 max-w-[1600px] mx-auto w-full">
+          {activeCategory === "Dashboard" && <Hero onExplore={() => setActiveCategory('promociones')} />}
 
           <section className="mb-16 mt-8">
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-3xl font-display text-brand-dark mb-2">
-                  {activeCategory === "Dashboard" ? "Novedades de Temporada" : 
-                   activeCategory === "Catálogo" ? "Catálogo de Productos" : activeCategory}
+                  {activeCategory === "Dashboard"
+                    ? popularProducts.length > 0 ? "Lo Más Popular" : "Novedades de Temporada"
+                    : activeCategory === "Catálogo" ? "Catálogo de Productos"
+                    : activeCategoryName}
                 </h2>
                 <p className="text-gray-500 text-sm">
                   Explora nuestra coleccion curada de productos eco-eficientes.
@@ -103,15 +116,29 @@ function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Categor
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-              {filteredProducts.map((product, index) => (
-                <ProductCard key={product.id} product={product} index={index} />
-              ))}
+              {loading ? (
+                Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="bg-white rounded-[32px] border border-slate-100 overflow-hidden animate-pulse">
+                    <div className="h-72 bg-slate-100" />
+                    <div className="p-8 space-y-3">
+                      <div className="h-3 bg-slate-100 rounded w-1/3" />
+                      <div className="h-5 bg-slate-100 rounded w-2/3" />
+                      <div className="h-3 bg-slate-100 rounded w-full" />
+                    </div>
+                  </div>
+                ))
+              ) : (
+                displayedProducts.map((product, index) => (
+                  <ProductCard key={product.id} product={product} index={index} />
+                ))
+              )}
             </div>
           </section>
 
           {activeCategory === "Dashboard" && <Benefits />}
+        </div>
 
-          <footer className="mt-40 -mx-4 md:-mx-8 lg:-mx-12">
+        <footer className="mt-auto">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-16 px-12 py-20 bg-white border-t border-slate-100">
               <div className="md:col-span-2">
                 <div className="flex items-center gap-3 mb-8">
@@ -196,7 +223,6 @@ function MainPage({ defaultCategory = "Dashboard" }: { defaultCategory?: Categor
               </div>
             </div>
           </footer>
-        </div>
       </main>
 
     </div>
@@ -215,6 +241,7 @@ export default function App() {
       </Routes>
       <CartDrawer />
       <LoginModal />
+      <WhatsAppFAB />
     </>
   );
 }

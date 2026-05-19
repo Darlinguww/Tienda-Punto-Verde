@@ -23,7 +23,7 @@ export function useAnalytics() {
       });
     };
 
-    (window as Record<string, unknown>).trackEvent = track;
+    (window as unknown as Record<string, unknown>).trackEvent = track;
   }, []);
 
   const trackClick = async (productId: string) => {

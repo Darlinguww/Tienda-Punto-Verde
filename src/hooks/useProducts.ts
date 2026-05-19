@@ -34,6 +34,7 @@ export function useProducts(categorySlug?: string) {
         description: (p.description_short || p.description) as string,
         price: p.price as number,
         category: p.category as string,
+        category_slug: p.category_slug as string,
         image: ((p.images as string[]) || [])[0] || '',
         featured: p.featured as boolean,
         promotion: p.promotion ? (p.promotion as { label: string }).label : undefined,

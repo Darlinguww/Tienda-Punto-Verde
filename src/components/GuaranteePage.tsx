@@ -1,7 +1,6 @@
 import { ArrowLeft, ShieldCheck, Wrench, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
-import WhatsAppButton from "./WhatsAppButton";
 import CartDrawer from "./CartDrawer";
 
 export default function GuaranteePage() {

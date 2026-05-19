@@ -84,6 +84,9 @@ create table customers (
   name text,
   email text,
   address text,
+  country text default 'Colombia',
+  department text,
+  city text,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
@@ -209,6 +212,10 @@ create policy "Productos son públicos" on products
   for select using (is_active = true);
 create policy "Categorías son públicas" on categories
   for select using (is_active = true);
+
+-- Customers: lectura para usuarios autenticados
+create policy "Customers lectura" on customers
+  for select using (true);
 
 -- Analytics: solo inserción pública (tracking)
 create policy "Tracking público" on analytics_events

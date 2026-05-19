@@ -3,6 +3,8 @@ import { X, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { trackEvent } from '../lib/analytics';
+import { supabase } from '../lib/supabase';
+import { useWhatsAppNumber } from '../hooks/useWhatsAppNumber';
 
 // Simple WhatsApp icon SVG
 const WhatsAppIcon = ({ size = 24, className = "" }) => (
@@ -21,6 +23,7 @@ const WhatsAppIcon = ({ size = 24, className = "" }) => (
 export default function CartDrawer() {
   const { isCartOpen, setIsCartOpen, items, updateQuantity, removeFromCart, cartTotal } = useCart();
   const { user, setIsLoginModalOpen } = useAuth();
+  const whatsAppNumber = useWhatsAppNumber();
 
   if (!isCartOpen) return null;
 
@@ -31,13 +34,16 @@ export default function CartDrawer() {
       return;
     }
 
-    // Rastrear métrica de click de WhatsApp
+    if (!whatsAppNumber) return;
+
     trackEvent('whatsapp_click');
 
-    const phoneNumber = "573000000000"; // Número de la tienda
+    const phoneNumber = whatsAppNumber;
     let message = `*Nuevo Pedido - Punto Verde* 🌿\n\n`;
     message += `*Cliente:* ${user.name}\n`;
     message += `*Correo:* ${user.email}\n`;
+    if (user.whatsapp) message += `*WhatsApp:* ${user.whatsapp}\n`;
+    if (user.city) message += `*Ciudad:* ${user.city}${user.department ? `, ${user.department}` : ''}\n`;
     message += `*Dirección:* ${user.address}\n\n`;
     message += `*Productos:*\n`;
     
@@ -59,6 +65,13 @@ export default function CartDrawer() {
         userAgent: navigator.userAgent 
       })
     }).catch(console.error);
+
+    // Incrementar interes de cada producto por su cantidad (fire-and-forget)
+    Promise.all(
+      items.map(item =>
+        supabase.rpc('increment_interes', { product_id: item.product.id, amount: item.quantity })
+      )
+    ).catch(console.error);
 
     window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, "_blank");
   };
@@ -157,9 +170,10 @@ export default function CartDrawer() {
                 ${cartTotal.toLocaleString()}
               </span>
             </div>
-            <button 
+            <button
               onClick={handleWhatsAppCheckout}
-              className="w-full py-4 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl font-bold shadow-lg shadow-[#25D366]/20 transition-all flex items-center justify-center gap-3"
+              disabled={!whatsAppNumber}
+              className="w-full py-4 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl font-bold shadow-lg shadow-[#25D366]/20 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <WhatsAppIcon size={20} />
               Enviar pedido por WhatsApp

@@ -3,13 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useProductsContext } from '../context/ProductContext';
 import { ArrowLeft, Plus, Image as ImageIcon, CheckCircle, Package, Edit2, Trash2, X, BarChart2, Users, MousePointer2, Search, LogOut } from 'lucide-react';
-import { Category, Product } from '../types';
+import { Product } from '../types';
 import { getAnalyticsStats } from '../lib/analytics';
+import { cloudinaryWebP } from '../lib/cloudinary';
 
 export default function AdminPanel() {
-  const { user, logout } = useAuth();
+  const { user, logout, loading } = useAuth();
   const navigate = useNavigate();
-  const { products, addProduct, updateProduct, removeProduct } = useProductsContext();
+  const { products, categories: dbCategories, addProduct, updateProduct, removeProduct } = useProductsContext();
 
   const [activeTab, setActiveTab] = useState<'products' | 'analytics'>('products');
 
@@ -18,7 +19,7 @@ export default function AdminPanel() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const [category, setCategory] = useState<Category>('Ventiladores');
+  const [category, setCategory] = useState('');
   const [image, setImage] = useState('');
   const [promotion, setPromotion] = useState('');
   const [success, setSuccess] = useState(false);
@@ -26,11 +27,10 @@ export default function AdminPanel() {
   const [stats, setStats] = useState(getAnalyticsStats());
 
   useEffect(() => {
-    // Proteger ruta de admin
-    if (!user || !user.isAdmin) {
+    if (!loading && (!user || !user.isAdmin)) {
       navigate('/');
     }
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
 
   useEffect(() => {
     if (activeTab === 'analytics') {
@@ -38,7 +38,17 @@ export default function AdminPanel() {
     }
   }, [activeTab]);
 
-  if (!user || !user.isAdmin) return null;
+  if (loading) return (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="w-8 h-8 border-4 border-brand-primary border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+
+  if (!user || !user.isAdmin) return (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="w-8 h-8 border-4 border-brand-primary border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
 
   const handleLogout = () => {
     logout();
@@ -50,7 +60,7 @@ export default function AdminPanel() {
     setName(p.name);
     setDescription(p.description);
     setPrice(p.price.toString());
-    setCategory(p.category as Category);
+    setCategory(p.category);
     setImage(p.image);
     setPromotion(p.promotion || '');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -68,12 +78,14 @@ export default function AdminPanel() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    const selectedCat = dbCategories.find((c) => c.name === category);
     const productData = {
       name,
       description,
       price: Number(price),
-      category,
-      image: image || 'https://images.unsplash.com/photo-1550009158-9effb64fda70?auto=format&fit=crop&q=80&w=600',
+      category: selectedCat?.name ?? category,
+      category_slug: selectedCat?.slug ?? '',
+      image: image || '',
       promotion: promotion ? promotion : undefined,
     };
 
@@ -90,7 +102,6 @@ export default function AdminPanel() {
     setTimeout(() => setSuccess(false), 3000);
   };
 
-  const categories: Category[] = ['Ventiladores', 'TV', 'Lavadoras', 'Neveras'];
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
@@ -189,10 +200,12 @@ export default function AdminPanel() {
                     <label className="block text-xs font-semibold text-slate-700 mb-1">Categoría</label>
                     <select
                       value={category}
-                      onChange={(e) => setCategory(e.target.value as Category)}
+                      onChange={(e) => setCategory(e.target.value)}
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-lg text-sm focus:bg-white focus:border-brand-primary/30 focus:ring-2 focus:ring-brand-primary/10 transition-all outline-none"
                     >
-                      {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                      {dbCategories.filter(c => c.slug !== 'promociones').map(c => (
+                        <option key={c.id} value={c.name}>{c.name}</option>
+                      ))}
                     </select>
                   </div>
                 </div>
@@ -255,7 +268,7 @@ export default function AdminPanel() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {products.map(p => (
                   <div key={p.id} className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex gap-4 hover:shadow-md transition-shadow group">
-                    <img src={p.image} alt={p.name} className="w-20 h-20 rounded-xl object-cover border border-slate-50" />
+                    <img src={cloudinaryWebP(p.image, 160)} alt={p.name} loading="lazy" className="w-20 h-20 rounded-xl object-cover border border-slate-50" />
                     <div className="flex-1 flex flex-col justify-center">
                       <h3 className="font-bold text-slate-800 text-sm line-clamp-1">{p.name}</h3>
                       <p className="text-brand-primary font-bold text-sm mt-1">${p.price.toLocaleString()}</p>

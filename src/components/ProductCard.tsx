@@ -4,6 +4,7 @@ import { ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Product } from '../types';
 import { useCart } from '../context/CartContext';
+import { cloudinaryWebP } from '../lib/cloudinary';
 
 interface ProductCardProps {
   product: Product;
@@ -18,7 +19,7 @@ export default function ProductCard({ product, index }: ProductCardProps) {
     maximumFractionDigits: 0
   }).format(product.price);
 
-  const slug = product.name.toLowerCase().replace(/\s+/g, '-').replace(/"/g, '');
+  const slug = product.slug ?? product.name.toLowerCase().replace(/\s+/g, '-').replace(/"/g, '');
 
   return (
     <motion.div
@@ -37,9 +38,10 @@ export default function ProductCard({ product, index }: ProductCardProps) {
               </span>
             </div>
           )}
-          <img 
-            src={product.image} 
+          <img
+            src={cloudinaryWebP(product.image, 800)}
             alt={product.name}
+            loading="lazy"
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
           />
           <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/5 transition-colors" />

@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\User\\\\Documents\\\\GitHub\\\\Tienda-punto-verde\" -Recurse -Depth 3 -Directory | Select-Object -ExpandProperty FullName | Where-Object { -not \\($_ -match 'node_modules|\\\\.git|\\\\.next' \\) } | Sort-Object)"
+    ]
+  }
+}
