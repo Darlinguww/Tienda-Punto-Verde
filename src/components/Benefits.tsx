@@ -1,6 +1,6 @@
 import React from 'react';
 import { Truck, ShoppingBag, ShieldCheck } from 'lucide-react';
-import { BENEFITS } from '../constants';
+import { useBenefits } from '../hooks/useBenefits';
 
 const ICON_MAP = {
   Truck: Truck,
@@ -9,6 +9,8 @@ const ICON_MAP = {
 };
 
 export default function Benefits() {
+  const benefits = useBenefits();
+
   return (
     <section className="mb-20">
       <div className="flex items-center justify-between mb-12">
@@ -17,7 +19,7 @@ export default function Benefits() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {BENEFITS.map((benefit) => {
+        {benefits.map((benefit) => {
           const Icon = ICON_MAP[benefit.icon as keyof typeof ICON_MAP];
           return (
             <div 

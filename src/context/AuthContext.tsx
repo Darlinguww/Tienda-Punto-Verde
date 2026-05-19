@@ -70,7 +70,7 @@ function createFallbackProfile(authUser: { id: string; email?: string }): UserPr
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   useEffect(() => {
@@ -117,6 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           : createFallbackProfile(session.user);
 
         setUser(basicProfile);
+        setLoading(false);
 
         if (!isAdmin && !profileFetchedRef.current) {
           profileFetchedRef.current = true;
@@ -127,6 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         profileFetchedRef.current = false;
         if (isMounted) setUser(null);
+        setLoading(false);
       }
     });
 

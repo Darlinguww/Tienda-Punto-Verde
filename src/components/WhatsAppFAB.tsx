@@ -1,11 +1,15 @@
 import React from 'react';
 import { MessageCircle } from 'lucide-react';
 import { useWhatsAppNumber } from '../hooks/useWhatsAppNumber';
+import { useCart } from '../context/CartContext';
+import { useLocation } from 'react-router-dom';
 
 export default function WhatsAppFAB() {
   const number = useWhatsAppNumber();
+  const { isCartOpen } = useCart();
+  const { pathname } = useLocation();
 
-  if (!number) return null;
+  if (!number || isCartOpen || pathname === '/admin') return null;
 
   const message = encodeURIComponent('Hola, necesito más información sobre los productos de Punto Verde');
 
