@@ -77,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let isMounted = true;
     const profileFetchedRef = { current: false };
 
-    const fetchCustomerProfile = async (userId: string, basicProfile: UserProfile) => {
+    const fetchCustomerProfile = async (userId: string) => {
       try {
         const { data: profileData, error: profileError } = await supabase
           .from('customers')
@@ -88,16 +88,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!isMounted) return;
 
         if (profileData && !profileError) {
-          setUser({
-            id: profileData.id,
-            name: profileData.name ?? basicProfile.name,
-            email: profileData.email ?? basicProfile.email,
-            whatsapp: profileData.whatsapp ?? '',
-            country: (profileData as Record<string, unknown>).country as string ?? '',
-            department: (profileData as Record<string, unknown>).department as string ?? '',
-            city: (profileData as Record<string, unknown>).city as string ?? '',
-            address: profileData.address ?? '',
-            isAdmin: false,
+          setUser(prev => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              name: profileData.name ?? prev.name,
+              email: profileData.email ?? prev.email,
+              whatsapp: profileData.whatsapp ?? '',
+              country: (profileData as Record<string, unknown>).country as string ?? '',
+              department: (profileData as Record<string, unknown>).department as string ?? '',
+              city: (profileData as Record<string, unknown>).city as string ?? '',
+              address: profileData.address ?? '',
+            };
           });
         }
       } catch {
@@ -118,7 +120,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (!isAdmin && !profileFetchedRef.current) {
           profileFetchedRef.current = true;
-          fetchCustomerProfile(session.user.id, basicProfile);
+          fetchCustomerProfile(session.user.id);
+        } else if (!isAdmin && profileFetchedRef.current && !user?.city) {
+          fetchCustomerProfile(session.user.id);
         }
       } else {
         profileFetchedRef.current = false;
